@@ -1,3 +1,3 @@
-.PHONY: docker_run_dev_dependencies
-docker_run_dev_dependencies:
-	docker-compose -f dependencies/docker-compose.yml up
+.PHONY: docker_run_dev_dependency_components
+docker_run_dev_dependency_components:
+	docker-compose -f deployments/docker-compose.yml up
