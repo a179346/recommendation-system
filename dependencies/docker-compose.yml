@@ -1,0 +1,25 @@
+name: recommendation
+
+services:
+  mysql:
+    image: mysql:9.2.0
+    container_name: ${COMPOSE_PROJECT_NAME}-mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - ${PWD}/storage/mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: recommendation
+      MYSQL_USER: recommendation-mysql-user
+      MYSQL_PASSWORD: recommendation-mysql-password
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+
+  redis:
+    image: redis:7.4.2-alpine3.21
+    container_name: ${COMPOSE_PROJECT_NAME}-redis
+    ports:
+      - 6379:6379
+    command: /bin/sh -c "redis-server /redis.conf"
+    volumes:
+      - ${PWD}/storage/redis:/data
+      - ${PWD}/dependencies/redis.conf:/redis.conf
