@@ -1,0 +1,299 @@
+openapi: 3.0.3
+info:
+  title: Recommendation System - OpenAPI 3.0
+  description: |-
+    This is recommendtaion system based on the OpenAPI 3.0 specification.
+  version: 1.0.0
+
+externalDocs:
+  description: System Design
+  url: https://github.com/a179346/recommendation-system/blob/main/doc/system-design.md
+
+servers:
+  - url: http://localhost:3000/api
+
+tags:
+  - name: recommendation
+    description: Get your recommendation
+  - name: user
+    description: Operations about user
+
+paths:
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        description: Create a new user
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john@email.com
+                password:
+                  type: string
+                  minLength: 6
+                  maxLength: 16
+                  description: |-
+                    The password must be at least 6 characters and no more than 16 characters long, and it must include at least one uppercase letter, one lowercase letter, and one special character.
+
+                    For ease of testing, the password will be sent without encryption
+                  example: '@Aa123'
+
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The email has been taken
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/verify-email:
+    get:
+      tags:
+        - user
+      summary: Verify email
+      operationId: verifyEmail
+      parameters:
+        - name: token
+          in: query
+          description: Token is used to verify the corresponding email.
+          required: true
+          explode: false
+          schema:
+            type: string
+            example: example_token
+
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The email has been verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: Login
+      operationId: login
+      requestBody:
+        description: Login
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john@email.com
+                password:
+                  type: string
+                  minLength: 6
+                  maxLength: 16
+                  description: |-
+                    The password must be at least 6 characters and no more than 16 characters long, and it must include at least one uppercase letter, one lowercase letter, and one special character.
+
+                    For ease of testing, the password will be sent without encryption
+                  example: '@Aa123'
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                properties:
+                  token:
+                    type: string
+                    description: Token is for authentication. It should be set to `Authorization` header.
+                    example: This is an example token.
+        '400':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Email not verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Email not found or incorrect password ([WHY I choose 404 when the password is incorrect](https://www.reddit.com/r/webdev/comments/swvevq/comment/hxofyyd/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button))
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /authed/recommendation:
+    get:
+      tags:
+        - recommendation
+      summary: Get recommendation
+      description: |-
+        This can only be done by the logged in user.
+      operationId: getRecommendation
+      security:
+        - recommendation_auth: []
+      parameters:
+        - name: cursor
+          in: query
+          description: Current cursor of the page ([Cursor Pagination](https://www.merge.dev/blog/cursor-pagination))
+          required: false
+          explode: false
+          schema:
+            type: integer
+            example: 5
+
+        - name: pageSize
+          in: query
+          description: |-
+            Max number of products to be returned in the response.
+
+            `Default`: 5
+          required: false
+          explode: false
+          schema:
+            type: integer
+            example: 5
+            minimum: 1
+            maximum: 20
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+                  nextCursor:
+                    type: integer
+                    description: nextCursor will be found only when there is a next page.
+                    example: 5
+        '400':
+          description: Invalid cursor or pageSize
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - product_id
+        - title
+        - price
+        - description
+        - category
+      properties:
+        product_id:
+          type: integer
+          example: 10
+        title:
+          type: string
+          example: SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s
+        price:
+          type: number
+          format: double
+          example: 109
+        description:
+          type: string
+          example: Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+        category:
+          type: string
+          example: electronics
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: This is an example error message.
+
+  securitySchemes:
+    recommendation_auth:
+      type: apiKey
+      name: Authorization
+      in: header

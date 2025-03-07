@@ -19,7 +19,7 @@ There are three layers
 
 ### API
 
-`POST /api/register`
+`POST /user/register`
 
 - Request Body (JSON):
   - email
@@ -38,7 +38,7 @@ There are three layers
 
 ### API
 
-`GET /api/verify-email?token=xxx`
+`GET /user/verify-email?token=xxx`
 
 - Response:
   - 200 -> OK
@@ -56,7 +56,7 @@ There are three layers
 
 ### API
 
-`POST /api/login`
+`POST /user/login`
 
 - Request Body (JSON):
   - email
@@ -80,7 +80,7 @@ There are three layers
 
 ### API
 
-`GET /api/recommendation?cursor=xxx&pageSize=yyy` ([Cursor Pagination](https://medium.com/better-programming/understanding-the-offset-and-cursor-pagination-8ddc54d10d98))
+`GET /authed/recommendation?cursor=xxx&pageSize=yyy` ([Cursor Pagination](https://www.merge.dev/blog/cursor-pagination))
 
 - Requset Header:
   - Authorization
