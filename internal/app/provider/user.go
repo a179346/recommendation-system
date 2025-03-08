@@ -36,3 +36,28 @@ func (userProvider UserProvider) CreateUser(
 	_, err := stmt.ExecContext(ctx, userProvider.db)
 	return err
 }
+
+func (userProvider UserProvider) VerifyEmail(
+	ctx context.Context,
+	token string,
+) (bool, error) {
+	updateStmt := User.UPDATE().
+		SET(
+			User.Verified.SET(Bool(true)),
+		).
+		WHERE(
+			User.Token.EQ(String(token)).
+				AND(User.Verified.EQ(Bool(false))),
+		)
+
+	result, err := updateStmt.ExecContext(ctx, userProvider.db)
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	return rowsAffected >= 1, nil
+}

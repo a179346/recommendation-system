@@ -18,7 +18,6 @@ type CustomValidator struct {
 
 func (cv *CustomValidator) Validate(i interface{}) error {
 	if err := cv.validator.Struct(i); err != nil {
-		// Optionally, you could return the error to give each route more control over the status code
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return nil
@@ -29,6 +28,7 @@ func GetServer(db *sql.DB) *echo.Echo {
 	emailProvider := provider.NewEmailProvier()
 
 	registerLogic := logic.NewRegister(userProvider, emailProvider)
+	VerifyEmailLogic := logic.NewVerifyEmail(userProvider)
 
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
@@ -39,6 +39,7 @@ func GetServer(db *sql.DB) *echo.Echo {
 	apiGroup := e.Group("/api")
 
 	apiGroup.POST("/user/register", handler.RegisterUser(registerLogic))
+	apiGroup.GET("/user/verify-email", handler.VerifyEmail(VerifyEmailLogic))
 
 	return e
 }
