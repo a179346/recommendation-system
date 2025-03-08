@@ -102,6 +102,7 @@ There are three layers
 | user_id            | INT          | X        | AUTO_INCREMENT / PRIMARY KEY                          |
 | email              | VARCHAR(255) | X        | UNIQUE                                                |
 | encrypted_password | VARCHAR(255) | X        |                                                       |
+| token              | VARCHAR(36)  | X        |                                                       |
 | created_at         | TIMESTAMP    | X        | DEFAULT CURRENT_TIMESTAMP                             |
 | updated_at         | TIMESTAMP    | X        | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP |
 

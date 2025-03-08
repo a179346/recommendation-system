@@ -15,6 +15,7 @@ type User struct {
 	UserID            int32 `sql:"primary_key"`
 	Email             string
 	EncryptedPassword string
+	Token             string
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 }
