@@ -19,4 +19,4 @@ gen_jet_sql_builder:
 		-rel-view-path=./view \
 		-rel-enum-path=./enum \
 		-ignore-tables=goose_db_version \
-		-path=./services/post_board/database/.jet_gen
+		-path=./internal/app/database/.jet_gen
