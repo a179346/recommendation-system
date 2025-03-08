@@ -44,7 +44,6 @@ There are three layers
   - 200 -> OK
   - 400 -> Invalid token
   - 404 -> Token not found
-  - 409 -> The email has been verified
   - 500 -> Unknown error
 
 ## Use case 3: User Login
@@ -103,6 +102,7 @@ There are three layers
 | email              | VARCHAR(255) | X        | UNIQUE                                                |
 | encrypted_password | VARCHAR(255) | X        |                                                       |
 | token              | VARCHAR(36)  | X        |                                                       |
+| verified           | TINYINY(1)   | X        | DEFAULT 0                                             |
 | created_at         | TIMESTAMP    | X        | DEFAULT CURRENT_TIMESTAMP                             |
 | updated_at         | TIMESTAMP    | X        | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP |
 

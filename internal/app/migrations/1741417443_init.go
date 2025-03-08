@@ -20,6 +20,7 @@ func Up1741417443(ctx context.Context, tx *sql.Tx) error {
 		`		email VARCHAR(255) NOT NULL UNIQUE,`,
 		`		encrypted_password VARCHAR(255) NOT NULL,`,
 		`		token VARCHAR(36) NOT NULL UNIQUE,`,
+		`		verified TINYINT(1) NOT NULL DEFAULT 0,`,
 		`		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,`,
 		`		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`,
 		`);`,
