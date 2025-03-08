@@ -100,8 +100,8 @@ There are three layers
 | Column             | Data Type    | Nullable | Other                                                 |
 | ------------------ | ------------ | -------- | ----------------------------------------------------- |
 | user_id            | INT          | X        | AUTO_INCREMENT / PRIMARY KEY                          |
-| email              | VARCHAR(128) | X        | UNIQUE                                                |
-| encrypted_password | VARCHAR(256) | X        |                                                       |
+| email              | VARCHAR(255) | X        | UNIQUE                                                |
+| encrypted_password | VARCHAR(255) | X        |                                                       |
 | created_at         | TIMESTAMP    | X        | DEFAULT CURRENT_TIMESTAMP                             |
 | updated_at         | TIMESTAMP    | X        | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP |
 
@@ -112,7 +112,7 @@ There are three layers
 | Column      | Data Type    | Nullable | Other                        |
 | ----------- | ------------ | -------- | ---------------------------- |
 | product_id  | INT          | X        | AUTO_INCREMENT / PRIMARY KEY |
-| title       | VARCHAR(128) | X        |                              |
+| title       | VARCHAR(127) | X        |                              |
 | price       | FLOAT(16,4)  | X        |                              |
 | description | MEDIUMTEXT   | X        |                              |
-| category    | VARCHAR(64)  | X        |                              |
+| category    | VARCHAR(63)  | X        |                              |
