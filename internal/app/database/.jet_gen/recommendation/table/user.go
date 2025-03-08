@@ -21,6 +21,7 @@ type userTable struct {
 	Email             mysql.ColumnString
 	EncryptedPassword mysql.ColumnString
 	Token             mysql.ColumnString
+	Verified          mysql.ColumnBool
 	CreatedAt         mysql.ColumnTimestamp
 	UpdatedAt         mysql.ColumnTimestamp
 
@@ -67,10 +68,11 @@ func newUserTableImpl(schemaName, tableName, alias string) userTable {
 		EmailColumn             = mysql.StringColumn("email")
 		EncryptedPasswordColumn = mysql.StringColumn("encrypted_password")
 		TokenColumn             = mysql.StringColumn("token")
+		VerifiedColumn          = mysql.BoolColumn("verified")
 		CreatedAtColumn         = mysql.TimestampColumn("created_at")
 		UpdatedAtColumn         = mysql.TimestampColumn("updated_at")
-		allColumns              = mysql.ColumnList{UserIDColumn, EmailColumn, EncryptedPasswordColumn, CreatedAtColumn, UpdatedAtColumn}
-		mutableColumns          = mysql.ColumnList{EmailColumn, EncryptedPasswordColumn, CreatedAtColumn, UpdatedAtColumn}
+		allColumns              = mysql.ColumnList{UserIDColumn, EmailColumn, EncryptedPasswordColumn, TokenColumn, VerifiedColumn, CreatedAtColumn, UpdatedAtColumn}
+		mutableColumns          = mysql.ColumnList{EmailColumn, EncryptedPasswordColumn, TokenColumn, VerifiedColumn, CreatedAtColumn, UpdatedAtColumn}
 	)
 
 	return userTable{
@@ -81,6 +83,7 @@ func newUserTableImpl(schemaName, tableName, alias string) userTable {
 		Email:             EmailColumn,
 		EncryptedPassword: EncryptedPasswordColumn,
 		Token:             TokenColumn,
+		Verified:          VerifiedColumn,
 		CreatedAt:         CreatedAtColumn,
 		UpdatedAt:         UpdatedAtColumn,
 

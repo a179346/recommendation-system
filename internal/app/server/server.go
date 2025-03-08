@@ -6,8 +6,7 @@ import (
 
 	"github.com/a179346/recommendation-system/internal/app/handler"
 	"github.com/a179346/recommendation-system/internal/app/logic"
-	"github.com/a179346/recommendation-system/internal/app/providers/email_provider"
-	"github.com/a179346/recommendation-system/internal/app/providers/user_provider"
+	"github.com/a179346/recommendation-system/internal/app/provider"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -26,8 +25,8 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 }
 
 func GetServer(db *sql.DB) *echo.Echo {
-	userProvider := user_provider.New(db)
-	emailProvider := email_provider.New()
+	userProvider := provider.NewUserProvider(db)
+	emailProvider := provider.NewEmailProvier()
 
 	registerLogic := logic.NewRegister(userProvider, emailProvider)
 
