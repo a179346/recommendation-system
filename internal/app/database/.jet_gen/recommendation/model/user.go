@@ -16,6 +16,7 @@ type User struct {
 	Email             string
 	EncryptedPassword string
 	Token             string
+	Verified          bool
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 }
