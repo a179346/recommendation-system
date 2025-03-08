@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/a179346/recommendation-system/internal/app/logic"
+	"github.com/a179346/recommendation-system/internal/pkg/set"
 	"github.com/labstack/echo/v4"
 )
 
@@ -19,6 +19,10 @@ func RegisterUser(
 	}
 
 	specialCharacters := "()[]{}<>+-*/?,.:;\"'_\\|~`!@#$%^&="
+	specialCharacterSet := set.New[byte]()
+	for i := 0; i < len(specialCharacters); i++ {
+		specialCharacterSet.Add(specialCharacters[i])
+	}
 
 	validatePassword := func(password string) bool {
 		var hasUppercase bool
@@ -31,7 +35,7 @@ func RegisterUser(
 				hasLowercase = true
 			} else if b >= 'A' && b <= 'Z' {
 				hasUppercase = true
-			} else if strings.IndexByte(specialCharacters, b) != -1 {
+			} else if specialCharacterSet.Has(b) {
 				hasSpecialCharacter = true
 			}
 		}

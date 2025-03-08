@@ -16,7 +16,7 @@ migration_down:
 
 .PHONY: gen_jet_sql_builder
 gen_jet_sql_builder:
-	jet -source=mysql -dsn="recommendation-mysql-user:recommendation-mysql-password@tcp(localhost:3306)/recommendation?charset=utf8&parseTime=true&multiStatements=true" \
+	jet -source=mysql -dsn="recommendation-mysql-user:recommendation-mysql-password@tcp(localhost:3306)/recommendation?charset=utf8mb4&parseTime=true&multiStatements=true" \
 		-schema=recommendation \
 		-rel-model-path=./model \
 		-rel-table-path=./table \

@@ -6,21 +6,20 @@ import (
 	"fmt"
 
 	"github.com/a179346/recommendation-system/internal/app/config"
-	"github.com/a179346/recommendation-system/internal/app/providers/email_provider"
-	"github.com/a179346/recommendation-system/internal/app/providers/user_provider"
+	"github.com/a179346/recommendation-system/internal/app/provider"
 	"github.com/a179346/recommendation-system/internal/pkg/cryption"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
 
 type RegisterLogic struct {
-	userProvider  user_provider.UserProvider
-	emailProvider email_provider.EmailProvider
+	userProvider  provider.UserProvider
+	emailProvider provider.EmailProvider
 }
 
 func NewRegister(
-	userProvider user_provider.UserProvider,
-	emailProvider email_provider.EmailProvider,
+	userProvider provider.UserProvider,
+	emailProvider provider.EmailProvider,
 ) RegisterLogic {
 	return RegisterLogic{
 		userProvider:  userProvider,
@@ -39,8 +38,8 @@ func (registerLogic RegisterLogic) RegisterUser(
 	token := uuid.New().String()
 
 	if err := registerLogic.userProvider.CreateUser(ctx, email, encryptedPassword, token); err != nil {
+		// 1062: Duplicate entry
 		if err, ok := err.(*mysql.MySQLError); ok && err.Number == 1062 {
-			// Duplicate entry (email)
 			return ErrDuplicatedEmail
 		}
 		return err

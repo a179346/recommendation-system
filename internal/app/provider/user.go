@@ -1,4 +1,4 @@
-package user_provider
+package provider
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type UserProvider struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) UserProvider {
+func NewUserProvider(db *sql.DB) UserProvider {
 	return UserProvider{db: db}
 }
 

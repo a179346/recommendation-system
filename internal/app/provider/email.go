@@ -1,4 +1,4 @@
-package email_provider
+package provider
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 type EmailProvider struct{}
 
-func New() EmailProvider {
+func NewEmailProvier() EmailProvider {
 	return EmailProvider{}
 }
 

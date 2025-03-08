@@ -43,7 +43,7 @@ There are three layers
 - Response:
   - 200 -> OK
   - 400 -> Invalid token
-  - 404 -> Token not found
+  - 404 -> Token isn't found or has been used
   - 500 -> Unknown error
 
 ## Use case 3: User Login
