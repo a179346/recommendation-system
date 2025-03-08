@@ -2,6 +2,10 @@
 docker_run_db_redis:
 	docker-compose -f deployments/docker-compose.yml up
 
+.PHONY: go_run_app
+go_run_app:
+	go run ./cmd/app
+
 .PHONY: migration_up
 migration_up:
 	MIGRATION_UP=true go run ./cmd/migration

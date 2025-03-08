@@ -8,7 +8,6 @@ import (
 	"github.com/a179346/recommendation-system/internal/app/config"
 	"github.com/a179346/recommendation-system/internal/app/providers/email_provider"
 	"github.com/a179346/recommendation-system/internal/app/providers/user_provider"
-	"github.com/a179346/recommendation-system/internal/pkg/console"
 	"github.com/a179346/recommendation-system/internal/pkg/cryption"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
@@ -40,9 +39,9 @@ func (registerLogic RegisterLogic) RegisterUser(
 	token := uuid.New().String()
 
 	if err := registerLogic.userProvider.CreateUser(ctx, email, encryptedPassword, token); err != nil {
-		if err, ok := err.(*mysql.MySQLError); ok {
-			//TODO
-			console.Infof("Number:%v SQLState:%v Message:%v", err.Number, err.SQLState, err.Message)
+		if err, ok := err.(*mysql.MySQLError); ok && err.Number == 1062 {
+			// Duplicate entry (email)
+			return ErrDuplicatedEmail
 		}
 		return err
 	}
