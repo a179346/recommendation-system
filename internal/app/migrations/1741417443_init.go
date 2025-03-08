@@ -22,12 +22,7 @@ func Up1741417443(ctx context.Context, tx *sql.Tx) error {
 		`		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,`,
 		`		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`,
 		`);`,
-	}
-	if _, err := tx.ExecContext(ctx, strings.Join(query, "\n")); err != nil {
-		return err
-	}
 
-	query = []string{
 		`CREATE TABLE product`,
 		`(`,
 		`		product_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,`,
@@ -45,10 +40,11 @@ func Up1741417443(ctx context.Context, tx *sql.Tx) error {
 }
 
 func Down1741417443(ctx context.Context, tx *sql.Tx) error {
-	if _, err := tx.ExecContext(ctx, `DROP TABLE IF EXISTS product;`); err != nil {
-		return err
+	query := []string{
+		`DROP TABLE IF EXISTS product;`,
+		`DROP TABLE IF EXISTS user;`,
 	}
-	if _, err := tx.ExecContext(ctx, `DROP TABLE IF EXISTS user;`); err != nil {
+	if _, err := tx.ExecContext(ctx, strings.Join(query, "\n")); err != nil {
 		return err
 	}
 

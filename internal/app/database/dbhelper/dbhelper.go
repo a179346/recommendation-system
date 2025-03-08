@@ -15,7 +15,7 @@ func Open() (*sql.DB, error) {
 	dbConfig := config.GetDBConfig()
 
 	databaseURL := fmt.Sprintf(
-		"%s:%s@tcp(%s:%v)/%s?charset=utf8",
+		"%s:%s@tcp(%s:%v)/%s?charset=utf8&parseTime=true&multiStatements=true",
 		dbConfig.User,
 		dbConfig.Password,
 		dbConfig.Host,
