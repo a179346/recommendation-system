@@ -1,8 +1,6 @@
 package provider
 
 import (
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/a179346/recommendation-system/internal/app/config"
@@ -38,24 +36,17 @@ func (authJwtProvider AuthJwtProvider) Sign(id int32) (string, error) {
 	return token.SignedString(jwtConfig.Secret)
 }
 
-// TODO remove ?
-func (authJwtProvider AuthJwtProvider) Parse(tokenString string) (*AuthJwtClaims, error) {
+type authJwtConfig struct {
+	SigningMethod string
+	NewClaimsFunc func() jwt.Claims
+	SigningKey    []byte
+}
+
+func (authJwtProvider AuthJwtProvider) GetConfig() authJwtConfig {
 	jwtConfig := config.GetJwtConfig()
-
-	token, err := jwt.ParseWithClaims(tokenString, &AuthJwtClaims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-		return jwtConfig.Secret, nil
-	})
-
-	if err != nil {
-		return nil, err
+	return authJwtConfig{
+		SigningMethod: jwt.SigningMethodHS256.Name,
+		NewClaimsFunc: func() jwt.Claims { return new(AuthJwtClaims) },
+		SigningKey:    jwtConfig.Secret,
 	}
-
-	claims, ok := token.Claims.(*AuthJwtClaims)
-	if !ok {
-		return nil, errors.New("unknown jwt payload")
-	}
-	return claims, nil
 }

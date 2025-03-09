@@ -184,10 +184,10 @@ paths:
         - recommendation
       summary: Get recommendation
       description: |-
-        This can only be done by the logged in user.
+        This can only be done by the logged in user. (Bearer Authentication)
       operationId: getRecommendation
       security:
-        - recommendation_auth: []
+        - bearerAuth: []
       parameters:
         - name: cursor
           in: query
@@ -287,7 +287,7 @@ components:
           example: This is an example error message.
 
   securitySchemes:
-    recommendation_auth:
-      type: apiKey
-      name: Authorization
-      in: header
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
