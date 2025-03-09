@@ -34,7 +34,7 @@ I am not a fan of ORM as it introduces a black box to the project. When the proj
 
 ##### Why I chose Query Builder over Raw SQL:
 
-Query builder makes the application support different database systems. I don't need to worry about syntax differences between MySQL and Postgres, etc.
+Query builder makes the application support different database systems. I don't need to worry about syntax differences between MySQL and PostgreSQL.
 
 ## Project Layout
 

@@ -43,7 +43,7 @@ or
 go run ./cmd/app
 ```
 
-You have successfully brought the server online! Let’s test it out.
+You have successfully brought the server online! Let’s test it.
 
 ## How to test recommendation system
 
