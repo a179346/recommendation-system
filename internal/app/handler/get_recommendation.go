@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/a179346/recommendation-system/internal/app/database/.jet_gen/recommendation/model"
+	"github.com/a179346/recommendation-system/internal/app/dto"
 	"github.com/a179346/recommendation-system/internal/app/logic"
 	"github.com/a179346/recommendation-system/internal/pkg/slicehelper"
 	"github.com/labstack/echo/v4"
@@ -14,7 +14,7 @@ func GetRecommendation(
 	getRecommendationLogic logic.GetRecommendationLogic,
 ) echo.HandlerFunc {
 	type product struct {
-		ProductID   int32   `json:"product_id"`
+		ProductID   int32   `json:"productId"`
 		Title       string  `json:"title"`
 		Price       float64 `json:"price"`
 		Description string  `json:"description"`
@@ -54,7 +54,7 @@ func GetRecommendation(
 		}
 
 		respBody := responseBody{
-			Data: slicehelper.Map(products, func(p model.Product) product {
+			Data: slicehelper.Map(products, func(p dto.Product) product {
 				return product{
 					ProductID:   p.ProductID,
 					Title:       p.Title,

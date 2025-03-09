@@ -254,13 +254,13 @@ components:
     Product:
       type: object
       required:
-        - product_id
+        - productId
         - title
         - price
         - description
         - category
       properties:
-        product_id:
+        productId:
           type: integer
           example: 10
         title:

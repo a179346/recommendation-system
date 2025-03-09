@@ -11,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	echomiddlewawre "github.com/labstack/echo/v4/middleware"
+	"github.com/redis/go-redis/v9"
 )
 
 type CustomValidator struct {
@@ -24,16 +25,20 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	return nil
 }
 
-func GetServer(db *sql.DB) *echo.Echo {
+func GetServer(
+	db *sql.DB,
+	redisClient *redis.Client,
+) *echo.Echo {
 	userProvider := provider.NewUserProvider(db)
 	productDbProvider := provider.NewProductDbProvider(db)
+	productRedisProvider := provider.NewProductRedisProvider(redisClient)
 	emailProvider := provider.NewEmailProvier()
 	authJwtProvider := provider.NewAuthJwtProvider()
 
 	registerLogic := logic.NewRegister(userProvider, emailProvider)
 	VerifyEmailLogic := logic.NewVerifyEmail(userProvider)
 	loginLogic := logic.NewLogin(userProvider, authJwtProvider)
-	getRecommendationLogic := logic.NewGetRecommendation(productDbProvider)
+	getRecommendationLogic := logic.NewGetRecommendation(productDbProvider, productRedisProvider)
 
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}

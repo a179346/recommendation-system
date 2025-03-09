@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	. "github.com/a179346/recommendation-system/internal/app/database/.jet_gen/recommendation/table"
+	"github.com/a179346/recommendation-system/internal/app/dto"
 	. "github.com/go-jet/jet/v2/mysql"
 
 	"github.com/a179346/recommendation-system/internal/app/database/.jet_gen/recommendation/model"
@@ -62,7 +63,7 @@ func (userProvider UserProvider) VerifyEmail(
 	return rowsAffected >= 1, nil
 }
 
-func (userProvider UserProvider) FindByEmail(ctx context.Context, email string) (model.User, error) {
+func (userProvider UserProvider) FindByEmail(ctx context.Context, email string) (dto.User, error) {
 	stmt := SELECT(
 		User.AllColumns,
 	).FROM(
@@ -73,5 +74,17 @@ func (userProvider UserProvider) FindByEmail(ctx context.Context, email string) 
 
 	var dest model.User
 	err := stmt.QueryContext(ctx, userProvider.db, &dest)
-	return dest, err
+	return formatUser(dest), err
+}
+
+func formatUser(u model.User) dto.User {
+	return dto.User{
+		UserID:            u.UserID,
+		Email:             u.Email,
+		EncryptedPassword: u.EncryptedPassword,
+		Token:             u.Token,
+		Verified:          u.Verified,
+		CreatedAt:         u.CreatedAt,
+		UpdatedAt:         u.UpdatedAt,
+	}
 }

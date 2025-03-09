@@ -13,6 +13,8 @@ import (
 	"github.com/a179346/recommendation-system/internal/app/server"
 	"github.com/a179346/recommendation-system/internal/pkg/console"
 	"github.com/a179346/recommendation-system/internal/pkg/graceful"
+	"github.com/a179346/recommendation-system/internal/pkg/redishelper"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -29,13 +31,26 @@ func run() error {
 		return fmt.Errorf("opendb.Open error: %w", err)
 	}
 	defer func() {
-		console.Info("Shutting down db...")
+		console.Info("Closing db connection...")
 		db.Close()
 	}()
 	db.SetMaxOpenConns(30)
 	dbhelper.WaitFor(context.Background(), db)
 
-	server := server.GetServer(db)
+	redisConfig := config.GetRedisConfig()
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%v", redisConfig.Host, redisConfig.Port),
+		Password: redisConfig.Password,
+		DB:       redisConfig.DB,
+		PoolSize: redisConfig.PoolSize,
+	})
+	defer func() {
+		console.Info("Closing redis connection...")
+		redisClient.Close()
+	}()
+	redishelper.WaitForConnected(context.Background(), redisClient)
+
+	server := server.GetServer(db, redisClient)
 
 	defer func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
