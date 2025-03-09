@@ -41,7 +41,7 @@ func (userProvider UserProvider) VerifyEmail(
 	ctx context.Context,
 	token string,
 ) (bool, error) {
-	updateStmt := User.UPDATE().
+	stmt := User.UPDATE().
 		SET(
 			User.Verified.SET(Bool(true)),
 		).
@@ -50,7 +50,7 @@ func (userProvider UserProvider) VerifyEmail(
 				AND(User.Verified.EQ(Bool(false))),
 		)
 
-	result, err := updateStmt.ExecContext(ctx, userProvider.db)
+	result, err := stmt.ExecContext(ctx, userProvider.db)
 	if err != nil {
 		return false, err
 	}
@@ -60,4 +60,18 @@ func (userProvider UserProvider) VerifyEmail(
 		return false, err
 	}
 	return rowsAffected >= 1, nil
+}
+
+func (userProvider UserProvider) FindByEmail(ctx context.Context, email string) (model.User, error) {
+	stmt := SELECT(
+		User.AllColumns,
+	).FROM(
+		User,
+	).WHERE(
+		User.Email.EQ(String(email)),
+	).LIMIT(1)
+
+	var dest model.User
+	err := stmt.QueryContext(ctx, userProvider.db, &dest)
+	return dest, err
 }

@@ -26,9 +26,11 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 func GetServer(db *sql.DB) *echo.Echo {
 	userProvider := provider.NewUserProvider(db)
 	emailProvider := provider.NewEmailProvier()
+	authJwtProvider := provider.NewAuthJwtProvider()
 
 	registerLogic := logic.NewRegister(userProvider, emailProvider)
 	VerifyEmailLogic := logic.NewVerifyEmail(userProvider)
+	loginLogic := logic.NewLogin(userProvider, authJwtProvider)
 
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
@@ -40,6 +42,7 @@ func GetServer(db *sql.DB) *echo.Echo {
 
 	apiGroup.POST("/user/register", handler.RegisterUser(registerLogic))
 	apiGroup.GET("/user/verify-email", handler.VerifyEmail(VerifyEmailLogic))
+	apiGroup.POST("/user/login", handler.Login(loginLogic))
 
 	return e
 }
