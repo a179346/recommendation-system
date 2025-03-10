@@ -13,6 +13,8 @@ import (
 func GetRecommendation(
 	getRecommendationLogic logic.GetRecommendationLogic,
 ) echo.HandlerFunc {
+	// There is a reason I don't just use dto.Product, even though they are the same at this point.
+	// Consider a scenario where we need to add a confidential field to dto.Product. If we use dto.Product here without being careful, we might unintentionally expose it to the client.
 	type product struct {
 		ProductID   int32   `json:"productId"`
 		Title       string  `json:"title"`

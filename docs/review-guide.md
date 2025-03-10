@@ -1,4 +1,4 @@
-This file discusses some decision-making aspects. I believe it will help you better understand the system.
+This file discusses the decisions I made throughout the development. I believe it will help you better understand the system.
 
 - [Three-layer architecture](#three-layer-architecture)
 - [Dependency Injection (DI)](#dependency-injection)
@@ -38,4 +38,19 @@ Query builder makes the application support different database systems. I don't 
 
 ## Project Layout
 
-TODO
+This project follows [standard Go project layout](https://github.com/golang-standards/project-layout).
+
+I’d like to particularly focus on the internal folder, as it can help you understand how I structured the code.
+
+- `internal`
+  - `app`: Application-specific code
+    - `config`: application environment variables
+    - `database`
+    - `dto`: Type definitions that are used across different layers.
+    - `handler`: handler layer
+    - `logic`: logic layer
+    - `middleware`
+    - `migrations`
+    - `provider`: provider layer
+    - `server`
+  - `pkg`: Code that isn’t application-specific. All packages under this folder are designed to be reusable across projects and should work without any modifications.
