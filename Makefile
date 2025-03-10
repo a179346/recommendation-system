@@ -14,6 +14,10 @@ migration_up:
 migration_down:
 	MIGRATION_UP=false go run ./cmd/migration
 
+.PHONY: go_test
+go_test:
+	go test ./...
+
 .PHONY: gen_jet_sql_builder
 gen_jet_sql_builder:
 	jet -source=mysql -dsn="recommendation-mysql-user:recommendation-mysql-password@tcp(localhost:3306)/recommendation?charset=utf8mb4&parseTime=true&multiStatements=true" \

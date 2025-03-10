@@ -44,95 +44,92 @@ func TestUserOperation(t *testing.T) {
 
 	server := server.GetServer(db, redisClient)
 
-	t.Run("login should fail before user is registered", func(t *testing.T) {
-		body, err := json.Marshal(map[string]any{
-			"email":    email,
-			"password": password,
-		})
-		if err != nil {
-			t.Errorf("json.Marshal error: %v", err)
-			return
+	sendRequest := func(method string, target string, body interface{}) (int, string, error) {
+		var reader io.Reader
+		if body != nil {
+			bodyBytes, err := json.Marshal(body)
+			if err != nil {
+				return 0, "", fmt.Errorf("json.Marshal error: %w", err)
+			}
+			reader = bytes.NewReader(bodyBytes)
 		}
-		req := httptest.NewRequest("POST", "/api/user/login", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
+
+		req := httptest.NewRequest(method, target, reader)
+		if body != nil {
+			req.Header.Set("Content-Type", "application/json")
+		}
+
 		w := httptest.NewRecorder()
 
 		server.ServeHTTP(w, req)
 
 		res := w.Result()
 		defer res.Body.Close()
-		if got, want := res.StatusCode, 404; got != want {
-			respBody, _ := io.ReadAll(res.Body)
-			t.Errorf("statusCode: got:%v want:%v %s", got, want, string(respBody))
+		respBodyBytes, err := io.ReadAll(res.Body)
+		if err != nil {
+			return 0, "", fmt.Errorf("io.ReadAll error: %w", err)
+		}
+
+		return res.StatusCode, string(respBodyBytes), nil
+	}
+
+	t.Run("login should fail before user is registered", func(t *testing.T) {
+		statusCode, respBody, err := sendRequest("POST", "/api/user/login", map[string]any{
+			"email":    email,
+			"password": password,
+		})
+		if err != nil {
+			t.Errorf("sendRequest error: %v", err)
+			return
+		}
+
+		if got, want := statusCode, 404; got != want {
+			t.Errorf("statusCode: got:%v want:%v %s", got, want, respBody)
 		}
 	})
 
 	t.Run("User register should succeed", func(t *testing.T) {
-		body, err := json.Marshal(map[string]any{
+		statusCode, respBody, err := sendRequest("POST", "/api/user/register", map[string]any{
 			"email":    email,
 			"password": password,
 		})
 		if err != nil {
-			t.Errorf("json.Marshal error: %v", err)
+			t.Errorf("sendRequest error: %v", err)
 			return
 		}
-		req := httptest.NewRequest("POST", "/api/user/register", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		w := httptest.NewRecorder()
 
-		server.ServeHTTP(w, req)
-
-		res := w.Result()
-		defer res.Body.Close()
-		if got, want := res.StatusCode, 200; got != want {
-			respBody, _ := io.ReadAll(res.Body)
-			t.Errorf("statusCode: got:%v want:%v %s", got, want, string(respBody))
+		if got, want := statusCode, 200; got != want {
+			t.Errorf("statusCode: got:%v want:%v %s", got, want, respBody)
 		}
 	})
 
 	t.Run("User register should fail because of duplicate email", func(t *testing.T) {
-		body, err := json.Marshal(map[string]any{
+		statusCode, respBody, err := sendRequest("POST", "/api/user/register", map[string]any{
 			"email":    email,
 			"password": password,
 		})
 		if err != nil {
-			t.Errorf("json.Marshal error: %v", err)
+			t.Errorf("sendRequest error: %v", err)
 			return
 		}
-		req := httptest.NewRequest("POST", "/api/user/register", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		w := httptest.NewRecorder()
 
-		server.ServeHTTP(w, req)
-
-		res := w.Result()
-		defer res.Body.Close()
-		if got, want := res.StatusCode, 409; got != want {
-			respBody, _ := io.ReadAll(res.Body)
-			t.Errorf("statusCode: got:%v want:%v %s", got, want, string(respBody))
+		if got, want := statusCode, 409; got != want {
+			t.Errorf("statusCode: got:%v want:%v %s", got, want, respBody)
 		}
 	})
 
 	t.Run("login should fail before verifying email", func(t *testing.T) {
-		body, err := json.Marshal(map[string]any{
+		statusCode, respBody, err := sendRequest("POST", "/api/user/login", map[string]any{
 			"email":    email,
 			"password": password,
 		})
 		if err != nil {
-			t.Errorf("json.Marshal error: %v", err)
+			t.Errorf("sendRequest error: %v", err)
 			return
 		}
-		req := httptest.NewRequest("POST", "/api/user/login", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		w := httptest.NewRecorder()
 
-		server.ServeHTTP(w, req)
-
-		res := w.Result()
-		defer res.Body.Close()
-		if got, want := res.StatusCode, 403; got != want {
-			respBody, _ := io.ReadAll(res.Body)
-			t.Errorf("statusCode: got:%v want:%v %s", got, want, string(respBody))
+		if got, want := statusCode, 403; got != want {
+			t.Errorf("statusCode: got:%v want:%v %s", got, want, respBody)
 		}
 	})
 
@@ -145,16 +142,14 @@ func TestUserOperation(t *testing.T) {
 			return
 		}
 
-		req := httptest.NewRequest("GET", "/api/user/verify-email?token="+i.Token, nil)
-		w := httptest.NewRecorder()
+		statusCode, respBody, err := sendRequest("GET", "/api/user/verify-email?token="+i.Token, nil)
+		if err != nil {
+			t.Errorf("sendRequest error: %v", err)
+			return
+		}
 
-		server.ServeHTTP(w, req)
-
-		res := w.Result()
-		defer res.Body.Close()
-		if got, want := res.StatusCode, 200; got != want {
-			respBody, _ := io.ReadAll(res.Body)
-			t.Errorf("statusCode: got:%v want:%v %s", got, want, string(respBody))
+		if got, want := statusCode, 200; got != want {
+			t.Errorf("statusCode: got:%v want:%v %s", got, want, respBody)
 		}
 	})
 
@@ -167,38 +162,28 @@ func TestUserOperation(t *testing.T) {
 			return
 		}
 
-		req := httptest.NewRequest("GET", "/api/user/verify-email?token="+i.Token, nil)
-		w := httptest.NewRecorder()
+		statusCode, respBody, err := sendRequest("GET", "/api/user/verify-email?token="+i.Token, nil)
+		if err != nil {
+			t.Errorf("sendRequest error: %v", err)
+			return
+		}
 
-		server.ServeHTTP(w, req)
-
-		res := w.Result()
-		defer res.Body.Close()
-		if got, want := res.StatusCode, 404; got != want {
-			respBody, _ := io.ReadAll(res.Body)
-			t.Errorf("statusCode: got:%v want:%v %s", got, want, string(respBody))
+		if got, want := statusCode, 404; got != want {
+			t.Errorf("statusCode: got:%v want:%v %s", got, want, respBody)
 		}
 	})
 	t.Run("login should succeed after verifying email", func(t *testing.T) {
-		body, err := json.Marshal(map[string]any{
+		statusCode, respBody, err := sendRequest("POST", "/api/user/login", map[string]any{
 			"email":    email,
 			"password": password,
 		})
 		if err != nil {
-			t.Errorf("json.Marshal error: %v", err)
+			t.Errorf("sendRequest error: %v", err)
 			return
 		}
-		req := httptest.NewRequest("POST", "/api/user/login", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		w := httptest.NewRecorder()
 
-		server.ServeHTTP(w, req)
-
-		res := w.Result()
-		defer res.Body.Close()
-		if got, want := res.StatusCode, 200; got != want {
-			respBody, _ := io.ReadAll(res.Body)
-			t.Errorf("statusCode: got:%v want:%v %s", got, want, string(respBody))
+		if got, want := statusCode, 200; got != want {
+			t.Errorf("statusCode: got:%v want:%v %s", got, want, respBody)
 		}
 	})
 }
