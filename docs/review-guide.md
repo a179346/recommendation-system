@@ -53,4 +53,5 @@ I’d like to particularly focus on the internal folder, as it can help you unde
     - `migrations`
     - `provider`: provider layer
     - `server`
+    - `test`: This is where the test code is located. It only contains integration tests for now.
   - `pkg`: Code that isn’t application-specific. All packages under this folder are designed to be reusable across projects and should work without any modifications.
